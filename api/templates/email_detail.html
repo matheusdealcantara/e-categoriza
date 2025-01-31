@@ -1,0 +1,14 @@
+{% extends 'header.html' %}
+
+{% block content %}
+    <body>
+        <h1>Assunto: {{ email.subject }}</h1>
+        <p>Email: {{ email.email }}</p>
+        <h2>Mensagem</h2>
+        <p>{{ email.message }}</p>
+        <h2>Resposta Gerada</h2>
+        <p>{{ email.response }} </p>
+        <p><strong>Category:</strong> {{ email.category }}</p>
+    </body>
+    </html>
+{% endblock %}
