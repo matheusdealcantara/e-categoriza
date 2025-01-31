@@ -6,8 +6,7 @@ import os
 
 # Load environment variables from .env file
 load_dotenv()
-model_name = AutoModelForSequenceClassification.from_pretrained("thecobsb/email-classifier")
-
+model_path = os.getenv('MODEL_PATH')
 
 def classify_text(text: str):
     

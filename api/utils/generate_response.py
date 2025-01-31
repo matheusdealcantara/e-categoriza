@@ -2,11 +2,13 @@ from huggingface_hub import InferenceClient
 from dotenv import load_dotenv
 import os
 
-# Load environment variables from .env file
+# Carregar variáveis de ambiente do arquivo .env
 load_dotenv()
 
+# Criar um cliente de inferência
 client = InferenceClient(api_key=os.getenv('HF_API_KEY'))
 
+# Função para gerar uma resposta para um email
 def generate_response(text: str) -> str:
     messages = [
         { "role": "user", "content": f"""Você é um assistente virtual de Inteligência Artificial que escreve respostas educadas e profissionais para emails. 
@@ -19,15 +21,17 @@ def generate_response(text: str) -> str:
          Aqui está um exemplo de email que você deve responder:\n\nEmail:\n{text}"""}
     ]
 
+    # Gerar resposta utilizando o modelo de geração de texto
     stream = client.chat.completions.create(
         model="meta-llama/Llama-3.2-3B-Instruct", 
         messages=messages, 
-        temperature=0.9,
-        max_tokens=1024,
-        top_p=0.95,
+        temperature=0.5,
+        max_tokens=2048,
+        top_p=0.7,
         stream=True
     )
 
+    # Extrair texto da resposta
     response_text = ""
     for chunk in stream:
         response_text += chunk.choices[0].delta.content

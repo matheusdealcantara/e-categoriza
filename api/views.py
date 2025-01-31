@@ -26,15 +26,18 @@ class EmailRegisterView(View):
         subject = request.POST.get('subject')
         message = request.POST.get('message')
 
+        # Checar se o arquivo foi enviado
         if 'file' in request.FILES:
             file = request.FILES['file']
             fs = FileSystemStorage(location='media/uploads')
             filename = fs.save(file.name, file)
             uploaded_file_url = fs.url(filename)
 
+            # Se o arquivo for .txt apenas leia o conteúdo
             if file.name.endswith('.txt'):
                 with open(f'media/uploads/{filename}', 'r', encoding='utf-8') as f:
                     content = f.read()
+            # Se o arquivo for .pdf leia o conteúdo de cada página
             elif file.name.endswith('.pdf'):
                 with open(f'media/uploads/{filename}', 'rb') as f:
                     reader = PyPDF2.PdfReader(f)
@@ -42,11 +45,15 @@ class EmailRegisterView(View):
                     for page_num in range(len(reader.pages)):
                         page = reader.pages[page_num]
                         content += page.extract_text()
+            # Se o arquivo não for .txt ou .pdf, retorne um erro
             else:
                 messages.error(request, 'Formato de arquivo não suportado. Apenas PDF e TXT são permitidos.')
                 return render(request, 'email_register.html')
 
+            # Remova espaços extras
             content = ' '.join(content.split())
+
+            # Extraia email, assunto e mensagem do conteúdo
             email, subject, message = extract_email_subject_message(content)
             if not email or not subject or not message:
                 messages.error(request, 'Falha ao extrair informações do arquivo.')
@@ -62,16 +69,23 @@ class EmailRegisterView(View):
             messages.error(request, 'Preencha o texto do email.')
             return render(request, 'email_register.html', {'form.message.errors': 'Message is required.'})
         
+        # Processar o texto
         processed_message = process_text(message)   
+
+        # Classificar o texto
         result = classify_text(processed_message)
 
+        # Criar objeto de email
         email_obj = Email()
 
+        # Categorizar o email
         category = "Produtivo" if result == 0 else "Improdutivo"
 
+        # Gerar resposta
         response = generate_response(processed_message)
 
         try:
+            # Registrar email
             email_obj.create_email(email, subject, message, category, response)
         except Exception as e:
             print(e)
