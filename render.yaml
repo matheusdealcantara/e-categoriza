@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: autou
+    env: python
+    buildCommand: |
+      apt-get update && apt-get install -y git-lfs
+      git lfs install
+      git lfs pull
+      pip install -r requirements.txt
+    startCommand: gunicorn autou.wsgi:application --bind 0.0.0.0:$PORT
+    envVars:
+      - key: SECRET_KEY
+        value: s8&z@e^npatsh07&s+j8o12*^_0m2sskp^_+hz%9o&zc!vvpb
+      - key: DEBUG
+        value: 'False'
+      - key: HF_API_KEY
+        value: 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
+      - key: MODEL_PATH
+        value: api/utils/email-classifier
