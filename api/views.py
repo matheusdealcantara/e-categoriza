@@ -74,19 +74,18 @@ class EmailRegisterView(View):
 
         # Classificar o texto
         result = classify_text(processed_message)
+        # Remover pontos e dígitos do resultado
+        result = ''.join([i for i in result if not i.isdigit() and i not in ['.', ',']])
 
         # Criar objeto de email
         email_obj = Email()
-
-        # Categorizar o email
-        category = "Produtivo" if result == 0 else "Improdutivo"
 
         # Gerar resposta
         response = generate_response(processed_message)
 
         try:
             # Registrar email
-            email_obj.create_email(email, subject, message, category, response)
+            email_obj.create_email(email, subject, message, result, response)
         except Exception as e:
             print(e)
             messages.error(request, 'Failed to register email.')

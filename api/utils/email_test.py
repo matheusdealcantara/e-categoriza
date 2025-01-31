@@ -1,5 +1,5 @@
 # Este arquivo testa a função classify_text do arquivo api/utils/categorize.py
-from api.utils.categorize import classify_text
+from categorize import classify_text
 
 def test_classify_text():
     emails = [
