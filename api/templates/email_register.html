@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Enviar Email</title>
+        <title>Email Dumper</title>
         <style>
             body {
                 font-family: Arial, sans-serif;
@@ -16,6 +16,10 @@
                 border: 1px solid #ccc;
                 border-radius: 10px;
             }
+            a {
+                text-decoration: none;
+                color: #333;
+            }
             label {
                 display: block;
                 margin-bottom: 8px;
@@ -26,6 +30,10 @@
                 margin-bottom: 20px;
                 border: 1px solid #ccc;
                 border-radius: 5px;
+            }
+            .error {
+                color: red;
+                margin-bottom: 20px;
             }
             button {
                 padding: 10px 20px;
@@ -41,22 +49,30 @@
         </style>
     </head>
     <body>
-        <h1>Enviar Email</h1>
+        <h1><a href="/">E-mail Dumper</a></h1>
         <form action="/email/" method="post" enctype="multipart/form-data">
             {% csrf_token %}
+            {% if messages %}
+                {% for message in messages %}
+                <div class="error">
+                        <p>{{ message }}</p>
+                </div>
+                {% endfor %}
+            {% endif %}
+            
             <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
+            <input type="email" id="email" name="email">
             
             <label for="subject">Assunto:</label>
-            <input type="text" id="subject" name="subject" required>
+            <input type="text" id="subject" name="subject">
             
             <label for="message">Mensagem:</label>
-            <textarea id="message" name="message" rows="10" required></textarea>
+            <textarea id="message" name="message" rows="10"></textarea>
             
             <label for="file">Anexar Arquivo (.txt ou .pdf):</label>
             <input type="file" id="file" name="file" accept=".txt, .pdf">
             
-            <button type="submit">Enviar</button>
-    </form>
-</body>
+            <button type="submit">Enviar email</button>
+        </form>
+    </body>
 </html>
