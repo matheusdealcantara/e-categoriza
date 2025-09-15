@@ -3,3 +3,6 @@ __pycache__/
 *.pyc
 migrations/
 .env
+Pipfile
+Pipfile.lock
+.DS_Store
