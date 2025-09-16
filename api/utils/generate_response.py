@@ -1,12 +1,14 @@
-from huggingface_hub import InferenceClient
-from dotenv import load_dotenv
 import os
+
+from dotenv import load_dotenv
+from openai import OpenAI
 
 # Carregar variáveis de ambiente do arquivo .env
 load_dotenv()
 
 # Criar um cliente de inferência
-client = InferenceClient(api_key=os.getenv('HF_API_KEY'))
+client = OpenAI(api_key=os.getenv('NSCALE_SERVICE_TOKEN'), 
+                base_url="https://inference.api.nscale.com/v1")
 
 # Função para gerar uma resposta para um email
 def generate_response(text: str) -> str:
@@ -21,19 +23,10 @@ def generate_response(text: str) -> str:
          Aqui está um exemplo de email que você deve responder:\n\nEmail:\n{text}"""}
     ]
 
-    # Gerar resposta utilizando o modelo de geração de texto
-    stream = client.chat.completions.create(
-        model="meta-llama/Llama-3.2-3B-Instruct", 
-        messages=messages, 
-        temperature=0.5,
-        max_tokens=2048,
-        top_p=0.7,
-        stream=True
+    # Extrair texto da resposta
+    response = client.chat.completions.create(
+        model="Qwen/Qwen3-4B-Instruct-2507",
+        messages = messages,
     )
 
-    # Extrair texto da resposta
-    response_text = ""
-    for chunk in stream:
-        response_text += chunk.choices[0].delta.content
-
-    return response_text.strip()
+    return response.choices[0].message.content
