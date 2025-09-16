@@ -1,31 +1,33 @@
 <!-- filepath: /e:/Programação/autou/api/templates/index.html -->
-{% extends "header.html" %}
-
-{% block content %}
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-        <h1>Lista de Emails</h1>
-        <a href="/email/new" class="btn-primary">Cadastrar Email</a>
-    </div>
-    <table>
-        <thead>
-            <tr>
-                <th>Email</th>
-                <th>Assunto</th>
-                <th>Texto</th>
-                <th>Categoria</th>
-                <th>Resposta Gerada</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for email in emails %}
-                <tr>
-                    <td><a href="/email/{{ email.id }}">{{ email.email }}</a></td>
-                    <td>{{ email.subject }}</td>
-                    <td>{{ email.message }}</td>
-                    <td>{{ email.category }}</td>
-                    <td>{{ email.response }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+{% extends "header.html" %} {% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center">
+  <h1>Lista de Emails</h1>
+  <a href="/email/new" class="btn-primary">Cadastrar Email</a>
+</div>
+<table>
+  <thead>
+    <tr>
+      <th>Email</th>
+      <th>Assunto</th>
+      <th>Texto</th>
+      <th>Categoria</th>
+      <th>Resposta Gerada</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if emails %} {% for email in emails %}
+    <tr>
+      <td><a href="/email/{{ email.id }}">{{ email.email }}</a></td>
+      <td>{{ email.subject }}</td>
+      <td>{{ email.message }}</td>
+      <td>{{ email.category }}</td>
+      <td>{{ email.response }}</td>
+    </tr>
+    {% endfor %} {% else %}
+    <tr>
+      <td colspan="5">Nenhum email encontrado.</td>
+    </tr>
+    {% endif %}
+  </tbody>
+</table>
 {% endblock %}
