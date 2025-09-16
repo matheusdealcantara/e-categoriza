@@ -1,0 +1,45 @@
+{% extends '../../api/templates/header.html' %} {% block content %}
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %} {% if messages %} {% for message in messages %}
+  <div
+    class="{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% endif %}"
+  >
+    {{ message }}
+  </div>
+  {% endfor %} {% endif %}
+
+  <label for="email">Email:</label>
+  <input type="email" id="email" name="email" />
+
+  <label for="subject">Assunto:</label>
+  <input type="text" id="subject" name="subject" />
+
+  <label for="message">Mensagem:</label>
+  <textarea id="message" name="message" rows="10"></textarea>
+
+  <label for="file">Anexar Arquivo (.txt ou .pdf):</label>
+  <input
+    type="file"
+    id="file"
+    name="file"
+    accept=".txt, .pdf"
+    style="display: none"
+    onchange="updateFileName()"
+  />
+  <label for="file" class="file-label">Escolher arquivo</label>
+  <span id="file-name" class="file-name"></span>
+
+  <button type="submit">Enviar email</button>
+</form>
+<script>
+  function updateFileName() {
+    const fileInput = document.getElementById("file");
+    const fileNameSpan = document.getElementById("file-name");
+    if (fileInput.files.length > 0) {
+      fileNameSpan.textContent = `Arquivo selecionado: ${fileInput.files[0].name}`;
+    } else {
+      fileNameSpan.textContent = "";
+    }
+  }
+</script>
+{% endblock %}
