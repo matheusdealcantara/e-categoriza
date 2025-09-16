@@ -1,12 +1,20 @@
-{% extends '../../api/templates/header.html' %} {% block content %}
+{% extends 'header.html' %} 
+{% block content %}
 <form method="post" enctype="multipart/form-data">
-  {% csrf_token %} {% if messages %} {% for message in messages %}
-  <div
-    class="{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% endif %}"
-  >
-    {{ message }}
-  </div>
-  {% endfor %} {% endif %}
+  {% csrf_token %} 
+  {% if messages %} 
+    {% for message in messages %}
+      <div
+        class="{% if message.tags == 'success' %}
+                  success
+              {% elif message.tags == 'error' %}
+                  error
+              {% endif %}"
+      >
+        {{ message }}
+      </div>
+    {% endfor %} 
+  {% endif %}
 
   <label for="email">Email:</label>
   <input type="email" id="email" name="email" />
