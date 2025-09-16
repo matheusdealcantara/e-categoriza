@@ -7,28 +7,11 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.generic import View
 from django.views.generic.detail import DetailView
 
-from emails.views import EmailRegisterView
+from emails.views import EmailDetailView, EmailRegisterView
+from www.views import AboutView, ContactView, GetEmailsView
 
 from .models import Email
 from .utils.categorize import classify_text
 from .utils.extract_file import extract_email_subject_message
 from .utils.generate_response import generate_response
 from .utils.process import process_text
-
-
-class GetEmailsView(View):
-
-    def get(self, request):
-        emails = Email().get_emails()
-        return render(request, 'index.html', {'emails': emails})
-
-class AboutView(View):
-
-    def get(self, request):
-        return render(request, 'about.html')
-    
-
-class ContactView(View):
-
-    def get(self, request):
-        return render(request, 'contact.html')

@@ -17,7 +17,8 @@ class Email(models.Model):
         return Email.objects.all()
     
     def get_email(self, email_id):
-        return Email.objects.get(pk=email_id)
+        email_obj = Email.objects.get(pk=email_id)
+        return email_obj
     
     def create_email(self, email, subject, message, category=None, response=None):
         new_email = Email(email=email, subject=subject, message=message, category=category, response=response)
