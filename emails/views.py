@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_protect
@@ -7,6 +7,7 @@ from django.views.generic import DetailView
 
 from api.utils import generate_response
 from api.utils.categorize import classify_text
+from api.utils.generate_response import generate_response
 from api.utils.process import process_text
 from emails.models import Email
 
