@@ -8,7 +8,6 @@ from django.views.generic import DetailView
 from api.utils import generate_response
 from api.utils.categorize import classify_text
 from api.utils.generate_response import generate_response
-from api.utils.process import process_text
 from emails.models import Email
 
 
