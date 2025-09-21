@@ -31,7 +31,7 @@ class EmailRegisterView(View):
             messages.error(request, 'Preencha o assunto.')
             return render(request, 'email_register.html', {'form.subject.errors': 'Subject is required.'})
         if not message:
-            messages.error(request, 'Preencha o texto do email.')
+            messages.error(request, 'Preencha o corpo do email.')
             return render(request, 'email_register.html', {'form.message.errors': 'Message is required.'})
         
         # Processar o texto
