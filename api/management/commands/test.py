@@ -11,17 +11,19 @@ class Command(DjangoTestCommand):
     help = "Starts the server, runs tests, and stops the server after tests."
 
     def handle(self, *args, **options):
-        # Start the database using docker compose
-        self.stdout.write(self.style.NOTICE('Starting database with Docker Compose...'))
-        db_up = subprocess.run([
-            'docker', 'compose', '-f', 'infra/compose.yaml', 'up', '-d'
-        ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        if db_up.returncode != 0:
-            self.stderr.write(self.style.ERROR('Failed to start database with Docker Compose.'))
-            self.stderr.write(db_up.stderr.decode())
-            return 1
-        time.sleep(5)  # Wait for the database to be ready
-        self.stdout.write(self.style.NOTICE('Database started.'))
+
+        if os.getenv('ENVIRONMENT') == 'development':
+            # Start the database using docker compose
+            self.stdout.write(self.style.NOTICE('Starting database with Docker Compose...'))
+            db_up = subprocess.run([
+                'docker', 'compose', '-f', 'infra/compose.yaml', 'up', '-d'
+            ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            if db_up.returncode != 0:
+                self.stderr.write(self.style.ERROR('Failed to start database with Docker Compose.'))
+                self.stderr.write(db_up.stderr.decode())
+                return 1
+            time.sleep(5)  # Wait for the database to be ready
+            self.stdout.write(self.style.NOTICE('Database started.'))
 
         # Start the server in a subprocess
         server = subprocess.Popen([
@@ -45,12 +47,13 @@ class Command(DjangoTestCommand):
             except subprocess.TimeoutExpired:
                 server.kill()
 
-            # Stop the database service
-            self.stdout.write(self.style.NOTICE('Stopping database with Docker Compose...'))
-            db_down = subprocess.run([
-                'docker', 'compose', '-f', 'infra/compose.yaml', 'down'
-            ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            if db_down.returncode != 0:
-                self.stderr.write(self.style.ERROR('Failed to stop database with Docker Compose.'))
-                self.stderr.write(db_down.stderr.decode())
+            if os.getenv('ENVIRONMENT') == 'development':
+                # Stop the database service
+                self.stdout.write(self.style.NOTICE('Stopping database with Docker Compose...'))
+                db_down = subprocess.run([
+                    'docker', 'compose', '-f', 'infra/compose.yaml', 'down'
+                ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                if db_down.returncode != 0:
+                    self.stderr.write(self.style.ERROR('Failed to stop database with Docker Compose.'))
+                    self.stderr.write(db_down.stderr.decode())
         return result

@@ -12,8 +12,31 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:16.8-alpine3.20
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: local_user
+          POSTGRES_PASSWORD: local_password
+          POSTGRES_DB: local_db
+        options: >-
+          --health-cmd="pg_isready -U local_user -d local_db"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     env:
       NSCALE_SERVICE_TOKEN: ${{ secrets.NSCALE_SERVICE_TOKEN }}
+      SECRET_KEY: test-secret-key-for-ci
+      DEBUG: True
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: local_db
+      POSTGRES_PASSWORD: local_password
+      POSTGRES_USER: local_user
+      DATABASE_URL: postgres://local_user:local_password@localhost:5432/local_db
 
     steps:
       - uses: actions/checkout@v4
@@ -26,10 +49,13 @@ jobs:
 
       - run: pip install -r requirements.txt
 
-      - run: docker compose -f infra/compose.yaml up -d
+      - name: Wait for PostgreSQL
+        run: |
+          until pg_isready -h localhost -p 5432 -U local_user; do
+            echo "Waiting for PostgreSQL..."
+            sleep 2
+          done
 
       - run: python manage.py migrate
-
-      - run: docker compose -f infra/compose.yaml down
 
       - run: python manage.py test
