@@ -1,0 +1,37 @@
+{% extends "header.html" %}
+
+{% block content %}
+<h2>Register</h2>
+
+<div class="form-container">
+    <form method="post" action="{% url 'register' %}">
+        {% csrf_token %}
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        <label for="first_name">First Name:</label>
+        <input type="text" id="first_name" name="first_name" required>
+        <label for="last_name">Last Name:</label>
+        <input type="text" id="last_name" name="last_name" required>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <label for="password_confirm">Confirm Password:</label>
+        <input type="password" id="password_confirm" name="password_confirm" required>
+        <button type="submit">Register</button>
+    </form>
+    <div class="login-link">
+        <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+    </div>
+    <div class="messages">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

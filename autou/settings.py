@@ -48,7 +48,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'api',
     'emails',
-    'www'
+    'www',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -61,6 +62,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+LOGIN_URL = '/users/login/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
 
 ROOT_URLCONF = 'autou.urls'
 

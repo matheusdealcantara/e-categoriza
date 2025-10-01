@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.views import View
@@ -12,7 +13,7 @@ from emails.models import Email
 
 # Create your views here.
 @method_decorator(csrf_protect, name='dispatch')
-class EmailRegisterView(View):
+class EmailRegisterView(LoginRequiredMixin, View):
 
     def get(self, request):
         return render(request, 'email_register.html')
@@ -58,7 +59,7 @@ class EmailRegisterView(View):
         messages.success(request, 'Email registered successfully.')
         return redirect('index')
 
-class EmailDetailView(DetailView):
+class EmailDetailView(LoginRequiredMixin, DetailView):
     model = Email
     template_name = 'email_detail.html'
     context_object_name = 'email'

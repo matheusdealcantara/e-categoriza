@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
 from django.views import View
 
@@ -5,7 +6,7 @@ from emails.models import Email
 
 
 # Create your views here.
-class GetEmailsView(View):
+class GetEmailsView(LoginRequiredMixin, View):
 
     def get(self, request):
         email_obj = Email()
@@ -15,10 +16,16 @@ class GetEmailsView(View):
 class AboutView(View):
 
     def get(self, request):
-        return render(request, 'about.html')
-    
+        return render(request, 'about.html')    
+
 
 class ContactView(View):
 
     def get(self, request):
         return render(request, 'contact.html')
+    
+
+class HomeView(View):
+    
+    def get(self, request):
+        return render(request, 'home.html')
