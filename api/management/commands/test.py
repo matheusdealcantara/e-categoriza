@@ -1,16 +1,43 @@
 import os
-import signal
 import subprocess
-import sys
 import time
-import urllib.error
-import urllib.request
 
 from django.core.management.commands.test import Command as DjangoTestCommand
 
 
 class Command(DjangoTestCommand):
     help = "Starts the server, runs tests, and stops the server after tests."
+
+    def wait_for_database(self):
+        """Wait for the database container to be ready."""
+        self.stdout.write(self.style.NOTICE('Waiting for database to be ready...'))
+        
+        max_attempts = 30
+        attempt = 0
+        
+        while attempt < max_attempts:
+            try:
+                # Check if postgres-dev container is ready
+                pg_check = subprocess.run([
+                    'docker', 'exec', 'postgres-dev', 'pg_isready', 
+                    '-U', os.getenv('POSTGRES_USER', 'local_user'),
+                    '-d', os.getenv('POSTGRES_DB', 'local_db')
+                ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                
+                if pg_check.returncode == 0:
+                    self.stdout.write(self.style.SUCCESS('Database is ready!'))
+                    return True
+                    
+            except subprocess.SubprocessError:
+                pass
+            
+            attempt += 1
+            if attempt <= max_attempts:
+                self.stdout.write(f'Attempt {attempt}/{max_attempts} - Database not ready, waiting...')
+            time.sleep(2)
+        
+        self.stderr.write(self.style.ERROR('Database failed to become ready within timeout.'))
+        return False
 
     def handle(self, *args, **options):
 
@@ -24,29 +51,19 @@ class Command(DjangoTestCommand):
                 self.stderr.write(self.style.ERROR('Failed to start database with Docker Compose.'))
                 self.stderr.write(db_up.stderr.decode())
                 return 1
-            self.stdout.write(self.style.NOTICE('Database started.'))
 
-        # Start the server in a subprocess
-        server = subprocess.Popen([
-            sys.executable, 'manage.py', 'runserver', '--noreload', '--insecure'
-        ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            if not self.wait_for_database():
+                return 1
+
+            self.stdout.write(self.style.SUCCESS('Database started.'))
 
         try:
-            self.stdout.write(self.style.NOTICE('Starting development server...'))
-            time.sleep(5)  # Wait a few seconds for the server to be ready
-            self.stdout.write(self.style.NOTICE('Development server started.'))
-
             # Run tests
             self.stdout.write(self.style.NOTICE('Running tests...'))
             result = super().handle(*args, **options)
         finally:
             # Stop the server
             self.stdout.write(self.style.NOTICE('Stopping development server...'))
-            server.terminate()
-            try:
-                server.wait(timeout=5)
-            except subprocess.TimeoutExpired:
-                server.kill()
 
             if os.getenv('ENVIRONMENT') == 'development':
                 # Stop the database service
@@ -58,16 +75,3 @@ class Command(DjangoTestCommand):
                     self.stderr.write(self.style.ERROR('Failed to stop database with Docker Compose.'))
                     self.stderr.write(db_down.stderr.decode())
         return result
-
-    def _wait_for_server(self, url='http://localhost:8000', timeout=30):
-        """Poll the server until it's ready or timeout is reached."""
-        start_time = time.time()
-        while time.time() - start_time < timeout:
-            try:
-                with urllib.request.urlopen(url, timeout=5) as response:
-                    if response.status == 200:
-                        return  # Server is ready
-            except (urllib.error.URLError, ConnectionResetError):
-                pass  # Server not ready yet, continue polling
-            time.sleep(1)  # Wait 1 second before retrying
-        raise RuntimeError(f"Server at {url} did not become ready within {timeout} seconds.")

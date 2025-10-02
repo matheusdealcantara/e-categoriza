@@ -19,5 +19,13 @@ def create_test_user():
 
     return user
 
+def clear_database():
+    try:
+        User = get_user_model()
+        User.objects.all().delete()
+    except Exception as e:
+        print(f"Error clearing database: {e}")
+
 if __name__ == "__main__":
     create_test_user()
+    clear_database()

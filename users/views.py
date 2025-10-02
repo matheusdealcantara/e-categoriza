@@ -62,7 +62,11 @@ class RegisterView(View):
 
         user = User(username=username, email=email, first_name=first_name, last_name=last_name)
         user.set_password(password)
-        user.save()
+        try:
+            user.save()
+        except Exception as e:
+            messages.error(request, f'Error creating user: {e}')
+            return render(request, 'register.html')
         return redirect('login')
 
 class ProfileView(DetailView):

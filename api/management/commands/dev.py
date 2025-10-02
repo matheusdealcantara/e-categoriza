@@ -51,10 +51,12 @@ class Command(RunserverCommand):
                 self.stderr.write(self.style.ERROR('Failed to start database with Docker Compose.'))
                 self.stderr.write(db_up.stderr.decode())
                 return 1
-            self.stdout.write(self.style.NOTICE('Database started.'))
-
+            
             if not self.wait_for_database():
                 return 1
+            
+            self.stdout.write(self.style.NOTICE('Database started.'))
+
 
         try:
             self.stdout.write(self.style.NOTICE('Starting development server...'))

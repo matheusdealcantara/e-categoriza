@@ -1,13 +1,16 @@
+from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from users.models import User
+from tests.orchestrator import clear_database
 
+User = get_user_model()
 
 # Create your tests here.
 class UserRegisterTest(TestCase):
     def setUp(self):
         self.client = Client()
+        clear_database()
         self.url = reverse('register')
 
     def test_register_user_with_unique_valid_data(self):
